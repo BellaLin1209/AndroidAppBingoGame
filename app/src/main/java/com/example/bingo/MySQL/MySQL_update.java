@@ -32,15 +32,7 @@ public class MySQL_update extends AsyncTask<Void, Void, Void> {
     String roomName;
     int roomStatus;
 
-//    public MySQL_update(String acc, int r1, int r2, int r3, int r4, int r5) {
-//        Log.e("log_tag MySQL_update", "MySQL_update in ");
-//        account = acc;
-//        room1 = r1;
-//        room2 = r2;
-//        room3 = r3;
-//        room4 = r4;
-//        room5 = r5;
-//    }
+
     public MySQL_update(String acc, String room, int status) {
         Log.e("log_tag MySQL_update", "MySQL_update in ");
         account = acc;
@@ -58,10 +50,6 @@ public class MySQL_update extends AsyncTask<Void, Void, Void> {
         nameValuePairs.add(new BasicNameValuePair("account", account));
         nameValuePairs.add(new BasicNameValuePair("roomName", roomName + ""));
         nameValuePairs.add(new BasicNameValuePair("roomStatus", roomStatus + ""));
-//        nameValuePairs.add(new BasicNameValuePair("room3", room3 + ""));
-//        nameValuePairs.add(new BasicNameValuePair("room4", room4 + ""));
-//        nameValuePairs.add(new BasicNameValuePair("room5", room5 + ""));
-
 
         InputStream is = null;
         HttpClient httpclient = null;

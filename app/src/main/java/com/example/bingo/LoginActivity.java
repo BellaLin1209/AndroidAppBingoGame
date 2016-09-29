@@ -53,7 +53,7 @@ public class LoginActivity extends Activity {
     String input_ip = "";//測試用預設140.123.174.165
     String input_name = "player";//預設
     String input_channel = "1"; //頻道
-    String input_acc="";//公司帳號
+    String input_acc = "";//公司帳號
 
 
     //資料庫
@@ -177,32 +177,64 @@ public class LoginActivity extends Activity {
 
                 //建立
                 case R.id.openBtn:
+                    //判斷是否已登入
+                    String loginstatus = getConfig(LoginActivity.this,
+                            "Config", "HostLogin", "false");//最後一欄為預設
+
                     if (input_ip.length() == 0) {
                         Toast.makeText(getApplicationContext(), "請點選設定，選擇您的伺服器位置", Toast.LENGTH_SHORT).show();
-                    } else {
-                        //判斷是否已登入
-                        String loginstatus = getConfig(LoginActivity.this,
-                                "Config", "HostLogin", "false");//最後一欄為預設
+                    } else if (loginstatus.equals("true")) {
+                        //已登入
 
-                        if (loginstatus.equals("true")) {
-                            //已登入
-                            openRoomStatus();
+                        String room =checkRoomStatus();
+                        if (room.equals("0")) {
+                            Toast.makeText(getApplicationContext(), "目前遊戲房全滿，請稍後再試！", Toast.LENGTH_SHORT).show();
                         } else {
-                            //尚未登入，出現登入畫面
-                            final View dialogview = LayoutInflater.from(LoginActivity.this).inflate(R.layout.adminlogin_fomat, null);
-                            new AlertDialog.Builder(LoginActivity.this)
-                                    .setTitle("管理員登入")
-                                    .setView(dialogview)
-                                    .setPositiveButton("登入", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            EditText edit_acc = (EditText) dialogview.findViewById(R.id.edit_acc);
-                                            EditText edit_pwd = (EditText) dialogview.findViewById(R.id.edit_pwd);
-                                            checkAdmin(edit_acc.getText().toString(), edit_pwd.getText().toString());
-                                        }
-                                    })
-                                    .show();
+                            Log.e("log_tag openRoomStatus", "checkRoom:"+ room +"換頁");
+                            //更新資料庫狀態
+                            new MySQL_update(input_acc, "room"+room  , 0);
+                            Toast.makeText(getApplicationContext(), "建立" + input_channel + "號遊戲房！", Toast.LENGTH_SHORT).show();
+                            //換頁
+                            input_name = "host";
+                            intent_method(input_ip, input_name, 1);
                         }
+
+                    } else if (loginstatus.equals("false")) {
+                        //尚未登入，出現登入畫面
+                        final View dialogview = LayoutInflater.from(LoginActivity.this).inflate(R.layout.adminlogin_fomat, null);
+                        new AlertDialog.Builder(LoginActivity.this)
+                                .setTitle("管理員登入")
+                                .setView(dialogview)
+                                .setPositiveButton("登入", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        EditText edit_acc = (EditText) dialogview.findViewById(R.id.edit_acc);
+                                        EditText edit_pwd = (EditText) dialogview.findViewById(R.id.edit_pwd);
+
+                                        Boolean login = checkAdmin(edit_acc.getText().toString(), edit_pwd.getText().toString());
+                                        if (login == true) {
+                                            //登入成功
+                                            Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
+                                            //記憶已登入
+                                            setConfig(LoginActivity.this, "Config", "HostLogin", "true");
+
+                                            String room =checkRoomStatus();
+                                            if (room.equals("0")) {
+                                                Toast.makeText(getApplicationContext(), "目前遊戲房全滿，請稍後再試！", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Log.e("log_tag openRoomStatus", "checkRoom:"+ room +"換頁");
+                                                //更新資料庫狀態
+                                                new MySQL_update(input_acc, "room"+room  , 0);
+                                                Toast.makeText(getApplicationContext(), "建立" + input_channel + "號遊戲房！", Toast.LENGTH_SHORT).show();
+                                                //換頁
+                                                input_name = "host";
+                                                intent_method(input_ip, input_name, 1);
+                                            }
+                                        }
+
+                                    }
+                                })
+                                .show();
                     }
                     break;
 
@@ -220,8 +252,8 @@ public class LoginActivity extends Activity {
 //                            }).show();
 //                    intent_method(input_ip, input_name, 2);
                     //AlertDialog 跳出詢問公司視窗
-                    Handler myHandler = new Handler();
-                    myHandler.postDelayed(myListAlertDialog, 1 * 1000);//幾秒後(delaySec)呼叫runTimerStop這個Runnable，再由這個Runnable去呼叫你想要做的事情
+//                    Handler myHandler = new Handler();
+//                    myHandler.postDelayed(myListAlertDialog, 1 * 1000);//幾秒後(delaySec)呼叫runTimerStop這個Runnable，再由這個Runnable去呼叫你想要做的事情
                     break;
 
 
@@ -233,7 +265,8 @@ public class LoginActivity extends Activity {
      * 建立按鈕 按下後的動作 開始
      *********************/
     //帳戶確認
-    public void checkAdmin(String edit_acc, String edit_pwd) {
+    public Boolean checkAdmin(String edit_acc, String edit_pwd) {
+        boolean status = false;
         //連線資料庫
         try {
             String result = DBConnector.executeQuery("SELECT * FROM " + DatabaseName + " WHERE account = '" + edit_acc + "' AND password = '" + edit_pwd + "' ");
@@ -241,35 +274,30 @@ public class LoginActivity extends Activity {
             if (result.equals("false")) {
                 Toast.makeText(getApplicationContext(), "網路連線不穩，請檢查網路連線", Toast.LENGTH_SHORT).show();
                 Log.e("log_tag checkAdmin", "result = network false");
-
+                status = false;
             } else if (result.equals("null")) {
                 Toast.makeText(getApplicationContext(), "登入失敗，請再確認一次", Toast.LENGTH_SHORT).show();
+                status = false;
             } else {
-                //記憶已登入
-                setConfig(LoginActivity.this, "Config", "HostLogin", "true");
-                Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
-                openRoomStatus();//開遊戲房
+                status = true;//登入成功
             }
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "網路連線失敗，請稍待再連線", Toast.LENGTH_SHORT).show();
             Log.e("log_tag checkAdmin", "解析JSON異常" + e);
         }
 
-
+        return status;
     }
 
-    //開遊戲房
-    public void openRoomStatus() {
+    //查看哪間遊戲房還空著
+    public String checkRoomStatus() {
         Log.e("log_tag openRoomStatus", "openRoomStatus IN");
 
-
         //取得記憶的account
-        String input_acc = getConfig(LoginActivity.this,
+        input_acc = getConfig(LoginActivity.this,
                 "Config", "db_account", "");//最後一欄為預設
-        input_ip = getConfig(LoginActivity.this,
-                "Config", "db_server", "");//最後一欄為預設
 
-        Log.e("log_tag checkRoomStatus", "input_acc=" + input_acc+"input_ip=" +input_ip);
+        Log.e("log_tag checkRoomStatus", "input_acc=" + input_acc + "input_ip=" + input_ip);
 
         sqlroom();//更新目前遊戲房狀態
 
@@ -277,34 +305,19 @@ public class LoginActivity extends Activity {
         input_channel = "0";
         if (jsonRoomList[0] == -1) {
             input_channel = "1";
-            new MySQL_update(input_acc, "room1", 0).execute();
         } else if (jsonRoomList[1] == -1) {
             input_channel = "2";
-            new MySQL_update(input_acc, "room2", 0).execute();
         } else if (jsonRoomList[2] == -1) {
             input_channel = "3";
-            new MySQL_update(input_acc, "room3", 0).execute();
         } else if (jsonRoomList[3] == -1) {
             input_channel = "4";
-            new MySQL_update(input_acc, "room4", 0).execute();
         } else if (jsonRoomList[4] == -1) {
             input_channel = "5";
-            new MySQL_update(input_acc, "room5", 0).execute();
         } else {
             input_channel = "0";
         }
 
-        if (input_channel.equals("0")) {
-            Toast.makeText(getApplicationContext(), "目前遊戲房全滿，請稍後再試！" , Toast.LENGTH_SHORT).show();
-        } else {
-            Log.e("log_tag openRoomStatus", "換頁");
-            Toast.makeText(getApplicationContext(), "建立" + input_channel + "號遊戲房！", Toast.LENGTH_SHORT).show();
-            //換頁
-            intent_method(input_ip,  "host", 1);
-        }
-
-        Log.e("log_tag checkRoomStatus", "openRoom: " + input_channel);
-
+        return input_channel;
     }
     /**************** 建立按鈕 按下後的動作 結束 *********************/
 
@@ -505,7 +518,7 @@ public class LoginActivity extends Activity {
      * Intent換頁統一設定 開始
      **/
     public void intent_method(String input_ip, String input_name, int mode) {
-
+        Log.e("log_tag", "intent_method in");
         //記憶ip位置.暱稱
         setConfig(LoginActivity.this, "Config", "input_ip", input_ip);
         setConfig(LoginActivity.this, "Config", "input_name", input_name + "_" + input_channel);
@@ -517,20 +530,20 @@ public class LoginActivity extends Activity {
             //使用者
             case 0:
                 intent.setClass(LoginActivity.this, UserRoomActivity.class);
+                LoginActivity.this.startActivity(intent);
                 break;
             //管理者
             case 1:
+                Log.e("log_tag", "case 1");
                 intent.setClass(LoginActivity.this, HostRoomActivity.class);
+                LoginActivity.this.startActivity(intent);
                 break;
             //設定
             case 2:
                 intent.setClass(LoginActivity.this, SettingActivity.class);
+                LoginActivity.this.startActivity(intent);
                 break;
-
-
         }
-        LoginActivity.this.startActivity(intent);
-
     }
 
 

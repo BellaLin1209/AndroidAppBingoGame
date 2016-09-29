@@ -68,7 +68,7 @@ public class DBConnector {
             result = "false";
             Log.e("log_tag DBConnector", e.toString());
         }
-        Log.e("log_tag DBConnector", "executeQuery result = "+result);
+
         return  result;
     }
 
