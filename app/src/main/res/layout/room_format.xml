@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:id="@+id/linear_room1"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@drawable/button_cus"
+        android:layout_height="60dp">
+
+        <TextView
+            android:text="1號遊戲房"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30dp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:text="未開啟"
+            android:textSize="30dp"
+            android:textColor="#a7a5a5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_room1"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:id="@+id/linear_room2"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@drawable/button_cus"
+        android:layout_height="60dp">
+
+        <TextView
+            android:text="2號遊戲房"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30dp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:text="未開啟"
+            android:textSize="30dp"
+            android:textColor="#a7a5a5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_room2"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:id="@+id/linear_room3"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@drawable/button_cus"
+        android:layout_height="60dp">
+
+        <TextView
+            android:text="3號遊戲房"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30dp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:text="未開啟"
+            android:textSize="30dp"
+            android:textColor="#a7a5a5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_room3"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:id="@+id/linear_room4"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@drawable/button_cus"
+        android:layout_height="60dp">
+
+        <TextView
+            android:text="4號遊戲房"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30dp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:text="未開啟"
+            android:textSize="30dp"
+            android:textColor="#a7a5a5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_room4"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:id="@+id/linear_room5"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@drawable/button_cus"
+        android:layout_height="60dp">
+
+        <TextView
+            android:text="5號遊戲房"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30dp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:text="未開啟"
+            android:textSize="30dp"
+            android:textColor="#a7a5a5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_room5"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</LinearLayout>

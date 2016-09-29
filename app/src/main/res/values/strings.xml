@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">BINGO遊戲(beta_v6)</string>
+
+    <string name="join">加入(遊客)</string>
+    <string name="create">建立(導遊)</string>
+    <string name="setting">設定</string>
+    <string name="about">關於</string>
+    <string name="IpaddrStr">伺服器地址</string>
+    <string name="UserName">玩家暱稱</string>
+
+    <string name="ServerIP">140.123.174.165</string>
+    <string name="HostName">host</string>
+    <string name="PlayerName">User</string>
+
+    <string name="about_content2">版本\nV1.1.4\n\n更新日期\n2016年09月07日\n\n開發者\nLCY,HWS,SCL Co-productions
+    \n\n開發人員電子信箱\nbellalin1209@outlook.com\n\n©2016 LCY,HWS,SCL Co-productions. All rights reserved.</string>
+</resources>
