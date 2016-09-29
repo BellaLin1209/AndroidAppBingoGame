@@ -76,12 +76,6 @@ public class HostRoomActivity extends Activity {
     private String channel = "";//頻道(遊戲房)
     private String account = "";//公司account
 
-
-    //progressbar 設定
-    Context context = HostRoomActivity.this;
-    ProgressDialog myDialog = null;
-
-
     //防呆
     public Boolean islogin = false;
     public Boolean log = false;//看伺服器有否回應

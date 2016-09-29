@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import static com.example.bingo.R.id.IpaddrEdit;
@@ -50,6 +53,7 @@ public class LoginActivity extends Activity {
     String input_ip = "";//測試用預設140.123.174.165
     String input_name = "player";//預設
     String input_channel = "1"; //頻道
+    String input_acc="";//公司帳號
 
 
     //資料庫
@@ -62,7 +66,7 @@ public class LoginActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
-
+        Log.e("log_tag", "LogingActivity onCreate in");
 
         UsernameEdit = (EditText) findViewById(R.id.UsernameEdit);
         joinBtn = (Button) findViewById(R.id.joinBtn);
@@ -71,26 +75,46 @@ public class LoginActivity extends Activity {
         tv_comname = (TextView) findViewById(R.id.tv_comname);
 
 
-        //連結資料庫SQL 背景作業
-        BackTask bt = new BackTask();
-        bt.execute();
+        //確定網路連線
+        ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
 
-        //判斷是否已選擇serverip
-        String log_comname = getConfig(LoginActivity.this,
-                "Config", "db_comname", "");//取得記憶的ip
+        //如果未連線的話，mNetworkInfo會等於null
+        if (mNetworkInfo != null) {
+            Log.e("log_tag", "mNetworkInfo != null");
+            //網路是否已連線(true or false)
+            mNetworkInfo.isConnected();
+            //網路連線方式名稱(WIFI or mobile)
+            mNetworkInfo.getTypeName();
+            //網路連線狀態
+            mNetworkInfo.getState();
+            //網路是否可使用
+            mNetworkInfo.isAvailable();
+            //網路是否已連接or連線中
+            mNetworkInfo.isConnectedOrConnecting();
+            //網路是否故障有問題
+            mNetworkInfo.isFailover();
+            //網路是否在漫遊模式
+            mNetworkInfo.isRoaming();
+            Log.e("log_tag", "mNetworkInfo.isConnectedOrConnecting()");
 
-        if (log_comname.length() == 0) {
-            //AlertDialog 跳出詢問公司視窗
-            Handler myHandler = new Handler();
-            myHandler.postDelayed(myListAlertDialog, 1 * 1000);//幾秒後(delaySec)呼叫runTimerStop這個Runnable，再由這個Runnable去呼叫你想要做的事情
+            //判斷是否已選擇serverip
+            String log_comname = getConfig(LoginActivity.this,
+                    "Config", "db_comname", "");//取得記憶的ip
+            tv_comname.setText(log_comname);
+            if (log_comname.length() == 0) {
+                Log.e("log_tag", "log_comname==0");
+                //CALL SQL
+                SQLConnect();
+            }
+            joinBtn.setOnClickListener(new BtnListener());
+            openBtn.setOnClickListener(new BtnListener());
+            settingBtn.setOnClickListener(new BtnListener());
+
+        } else {
+            Toast.makeText(getApplicationContext(), "您目前未連網，請確定網路連線", Toast.LENGTH_SHORT).show();
+            Log.e("log_tag", "mNetworkInfo = null");
         }
-        tv_comname.setText(getConfig(LoginActivity.this,
-                "Config", "db_comname", ""));
-
-
-        joinBtn.setOnClickListener(new BtnListener());
-        openBtn.setOnClickListener(new BtnListener());
-        settingBtn.setOnClickListener(new BtnListener());
 
         //連結資料庫時以防除錯會一直跑Catch所以加入下面兩段，即可避免此情形
         StrictMode
@@ -140,10 +164,10 @@ public class LoginActivity extends Activity {
                         } else {
                             //選房間
                             sqlroom();
-
                             //AlertDialog
                             Handler myHandler2 = new Handler();
-                            myHandler2.postDelayed(roomListAlertDialog, 1 * 1000); //跑出選單
+                            //跑出選單
+                            myHandler2.postDelayed(roomListAlertDialog, 1 * 1000);//幾秒後(delaySec)呼叫runTimerStop這個Runnable，再由這個Runnable去呼叫你想要做的事情
 
                         }
                     } catch (UnsupportedEncodingException e) {
@@ -157,7 +181,28 @@ public class LoginActivity extends Activity {
                         Toast.makeText(getApplicationContext(), "請點選設定，選擇您的伺服器位置", Toast.LENGTH_SHORT).show();
                     } else {
                         //判斷是否已登入
-                        checkhostlogin();
+                        String loginstatus = getConfig(LoginActivity.this,
+                                "Config", "HostLogin", "false");//最後一欄為預設
+
+                        if (loginstatus.equals("true")) {
+                            //已登入
+                            openRoomStatus();
+                        } else {
+                            //尚未登入，出現登入畫面
+                            final View dialogview = LayoutInflater.from(LoginActivity.this).inflate(R.layout.adminlogin_fomat, null);
+                            new AlertDialog.Builder(LoginActivity.this)
+                                    .setTitle("管理員登入")
+                                    .setView(dialogview)
+                                    .setPositiveButton("登入", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            EditText edit_acc = (EditText) dialogview.findViewById(R.id.edit_acc);
+                                            EditText edit_pwd = (EditText) dialogview.findViewById(R.id.edit_pwd);
+                                            checkAdmin(edit_acc.getText().toString(), edit_pwd.getText().toString());
+                                        }
+                                    })
+                                    .show();
+                        }
                     }
                     break;
 
@@ -187,32 +232,6 @@ public class LoginActivity extends Activity {
     /***************
      * 建立按鈕 按下後的動作 開始
      *********************/
-    //確認是否已登入
-    public void checkhostlogin() {
-
-        String loginstatus = getConfig(LoginActivity.this,
-                "Config", "HostLogin", "false");//最後一欄為預設
-        if (loginstatus.equals("true")) {
-            //已登入
-            openRoomStatus();
-        } else {
-            //尚未登入，出現登入畫面
-            final View dialogview = LayoutInflater.from(LoginActivity.this).inflate(R.layout.adminlogin_fomat, null);
-            new AlertDialog.Builder(LoginActivity.this)
-                    .setTitle("管理員登入")
-                    .setView(dialogview)
-                    .setPositiveButton("登入", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            EditText edit_acc = (EditText) dialogview.findViewById(R.id.edit_acc);
-                            EditText edit_pwd = (EditText) dialogview.findViewById(R.id.edit_pwd);
-                            checkAdmin(edit_acc.getText().toString(), edit_pwd.getText().toString());
-                        }
-                    })
-                    .show();
-        }
-    }
-
     //帳戶確認
     public void checkAdmin(String edit_acc, String edit_pwd) {
         //連線資料庫
@@ -223,7 +242,7 @@ public class LoginActivity extends Activity {
                 Toast.makeText(getApplicationContext(), "網路連線不穩，請檢查網路連線", Toast.LENGTH_SHORT).show();
                 Log.e("log_tag checkAdmin", "result = network false");
 
-            } else if (result.equals(null)) {
+            } else if (result.equals("null")) {
                 Toast.makeText(getApplicationContext(), "登入失敗，請再確認一次", Toast.LENGTH_SHORT).show();
             } else {
                 //記憶已登入
@@ -242,41 +261,49 @@ public class LoginActivity extends Activity {
     //開遊戲房
     public void openRoomStatus() {
         Log.e("log_tag openRoomStatus", "openRoomStatus IN");
-        sqlroom();//更新目前遊戲房狀態
+
 
         //取得記憶的account
         String input_acc = getConfig(LoginActivity.this,
                 "Config", "db_account", "");//最後一欄為預設
-        String openRoom = "0";
+        input_ip = getConfig(LoginActivity.this,
+                "Config", "db_server", "");//最後一欄為預設
+
+        Log.e("log_tag checkRoomStatus", "input_acc=" + input_acc+"input_ip=" +input_ip);
+
+        sqlroom();//更新目前遊戲房狀態
+
+        //依序判斷哪個遊戲房閒置→開啟哪一個，就更新資料庫
+        input_channel = "0";
         if (jsonRoomList[0] == -1) {
-            openRoom = "1";
+            input_channel = "1";
             new MySQL_update(input_acc, "room1", 0).execute();
         } else if (jsonRoomList[1] == -1) {
-            openRoom = "2";
+            input_channel = "2";
             new MySQL_update(input_acc, "room2", 0).execute();
         } else if (jsonRoomList[2] == -1) {
-            openRoom = "3";
+            input_channel = "3";
             new MySQL_update(input_acc, "room3", 0).execute();
         } else if (jsonRoomList[3] == -1) {
-            openRoom = "4";
+            input_channel = "4";
             new MySQL_update(input_acc, "room4", 0).execute();
         } else if (jsonRoomList[4] == -1) {
-            openRoom = "5";
+            input_channel = "5";
             new MySQL_update(input_acc, "room5", 0).execute();
         } else {
-            openRoom = "0";
+            input_channel = "0";
         }
 
-        if (openRoom.equals("0")) {
-            Toast.makeText(getApplicationContext(), "目前遊戲房全滿，請稍後再試！" + openRoom, Toast.LENGTH_SHORT).show();
+        if (input_channel.equals("0")) {
+            Toast.makeText(getApplicationContext(), "目前遊戲房全滿，請稍後再試！" , Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getApplicationContext(), "建立" + openRoom + "號遊戲房！", Toast.LENGTH_SHORT).show();
+            Log.e("log_tag openRoomStatus", "換頁");
+            Toast.makeText(getApplicationContext(), "建立" + input_channel + "號遊戲房！", Toast.LENGTH_SHORT).show();
             //換頁
-            input_name = "host";
-            intent_method(input_ip, input_name, 1);
+            intent_method(input_ip,  "host", 1);
         }
 
-        Log.e("log_tag checkRoomStatus", "openRoom: " + openRoom);
+        Log.e("log_tag checkRoomStatus", "openRoom: " + input_channel);
 
     }
     /**************** 建立按鈕 按下後的動作 結束 *********************/
@@ -289,7 +316,7 @@ public class LoginActivity extends Activity {
     public void sqlroom() {
 
         //取得記憶的account
-        String input_acc = getConfig(LoginActivity.this,
+        input_acc = getConfig(LoginActivity.this,
                 "Config", "db_account", "");//最後一欄為預設
         Log.e("log_tag sqlroom", "acc: " + input_acc);
 
@@ -568,19 +595,25 @@ public class LoginActivity extends Activity {
         return settings.getString(key, def);
     }
 
-    /**
-     * 背景作業 連結呼叫資料庫
-     **/
-    private class BackTask extends AsyncTask<Void, Void, Void> {
-        protected Void doInBackground(Void... params) {
 
-            try {
-                String result = DBConnector.executeQuery("SELECT * FROM BingoGameDatabace");
+    //連線資料庫
+    public void SQLConnect() {
+        try {
+            String result = DBConnector.executeQuery("SELECT * FROM " + DatabaseName);
+            Log.e("log_tag SQLConnect", "result =" + result);
+//            result = result.substring(result.indexOf("{"));//JSONObject 要加;JSONArray則不用 ,否則會錯
+
+
+            if (result.equals("false")) {
+                Toast.makeText(getApplicationContext(), "網路連線不穩，請檢查網路連線", Toast.LENGTH_SHORT).show();
+                Log.e("log_tag SQLConnect", "result = network false");
+
+            } else {
                 JSONArray jsonArray = new JSONArray(result);
-
                 jsonDataList = new String[jsonArray.length()][5];
 
                 for (int i = 0; i < jsonArray.length(); i++) {
+                    Log.e("log_tag SQLConnect", "for:" + i);
                     JSONObject jsonData = jsonArray.getJSONObject(i);
 
                     //存進陣列
@@ -590,16 +623,48 @@ public class LoginActivity extends Activity {
                     jsonDataList[i][3] = jsonData.getString("server");
                     jsonDataList[i][4] = jsonData.getString("account");
                 }
-
-            } catch (Exception e) {
-                Log.e("log_tag", "解析JSON異常");
             }
-            return null;
-        }
 
-        protected void onPostExecute(Void result) {
-            Log.e("log_tag", "onPostExecute result");
+            //AlertDialog 跳出詢問公司視窗
+            Handler myHandler = new Handler();
+            myHandler.postDelayed(myListAlertDialog, 1 * 1000);//幾秒後(delaySec)呼叫runTimerStop這個Runnable，再由這個Runnable去呼叫你想要做的事情
+
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "網路連線失敗，請稍待再連線", Toast.LENGTH_SHORT).show();
+            Log.e("log_tag SQLConnect", "解析JSON異常" + e);
         }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+
+        //初始化
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("Config", 0);
+        SharedPreferences.Editor PE = settings.edit();
+        PE.clear();
+        PE.commit();
+        Log.e("log_tag LoginActivity", "onDestroy 初始化");
+
+        try {
+            //更新資料庫
+            if (input_channel.equals("1")) {
+                new MySQL_update(input_acc, "room1", -1).execute();
+            } else if (input_channel.equals("2")) {
+                new MySQL_update(input_acc, "room2", -1).execute();
+            } else if (input_channel.equals("3")) {
+                new MySQL_update(input_acc, "room3", -1).execute();
+            } else if (input_channel.equals("4")) {
+                new MySQL_update(input_acc, "room4", -1).execute();
+            } else if (input_channel.equals("5")) {
+                new MySQL_update(input_acc, "room5", -1).execute();
+            }
+
+        } catch (Exception e) {
+        }
+        Log.e("BELLA", "onDestroy");
     }
 
 }
