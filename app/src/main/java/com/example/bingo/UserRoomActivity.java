@@ -131,16 +131,16 @@ public class UserRoomActivity extends Activity {
     //判斷下一個的可能性
     public int possible1 = 0;
     public int possible2 = 0;
-    public int possible3 = 0;
+    public int possible3 = 1;
     public int possible4 = 0;
     public int possible5 = 0;
     public int possible6 = 0;
     public int possible7 = 0;
-    public int possible8 = 0;
+    public int possible8 = 1;
     public int possible9 = 0;
     public int possible10 = 0;
-    public int possible11 = 0;
-    public int possible12 = 0;
+    public int possible11 = 1;
+    public int possible12 = 1;
 
     public String last = "";
     public int win = 0;
@@ -946,7 +946,9 @@ public class UserRoomActivity extends Activity {
             possible8++;
             bestPosible--;
             checkBingo();
-        } else if (three3.getText().toString().equals(data)) {
+        } 
+		/*這裡是中間點
+		else if (three3.getText().toString().equals(data)) {
             three3.setEnabled(false);
             three3.setTextColor(Color.GRAY);
             three3.setBackgroundColor(Color.BLACK);
@@ -958,7 +960,8 @@ public class UserRoomActivity extends Activity {
             possible12++;
             bestPosible--;
             checkBingo();
-        } else if (three4.getText().toString().equals(data)) {
+        } */
+		else if (three4.getText().toString().equals(data)) {
             three4.setEnabled(false);
             three4.setTextColor(Color.GRAY);
             three4.setBackgroundColor(Color.BLACK);
