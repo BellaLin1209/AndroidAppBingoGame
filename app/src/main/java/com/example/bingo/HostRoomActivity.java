@@ -71,7 +71,7 @@ public class HostRoomActivity extends Activity {
     private RecvThread recvThread = new RecvThread();
 
 
-    private String serverIP = "140.123.174.165"; //服務器IP地址預設
+    private String serverIP = ""; //服務器IP地址預設
     private String userName = "host";//預設
     private String channel = "";//頻道(遊戲房)
     private String account = "";//公司account

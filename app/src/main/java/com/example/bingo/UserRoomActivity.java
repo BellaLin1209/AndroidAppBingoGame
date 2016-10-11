@@ -55,7 +55,7 @@ public class UserRoomActivity extends Activity {
     private RefleshHandler recvhandler = new RefleshHandler();
     private RecvThread recvThread = new RecvThread();
 
-    private String serverIP = "140.123.175.13"; //服務器IP地址預設
+    private String serverIP = ""; //服務器IP地址預設
     private String userName = "player";//預設
     private String channel = "";
 

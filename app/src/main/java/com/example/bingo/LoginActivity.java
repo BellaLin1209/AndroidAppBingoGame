@@ -411,7 +411,6 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
-                    Toast.makeText(getApplicationContext(), "room1", Toast.LENGTH_SHORT).show();
                     input_channel = "1";
                     checkRoomStatus(tv_room1.getText().toString());
                 }
@@ -420,7 +419,6 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
-                    Toast.makeText(getApplicationContext(), "room2", Toast.LENGTH_SHORT).show();
                     input_channel = "2";
                     checkRoomStatus(tv_room2.getText().toString());
                 }
@@ -429,7 +427,6 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
-                    Toast.makeText(getApplicationContext(), "room3", Toast.LENGTH_SHORT).show();
                     input_channel = "3";
                     checkRoomStatus(tv_room3.getText().toString());
                 }
@@ -438,7 +435,6 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
-                    Toast.makeText(getApplicationContext(), "room4", Toast.LENGTH_SHORT).show();
                     input_channel = "4";
                     checkRoomStatus(tv_room4.getText().toString());
                 }
@@ -447,7 +443,6 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
-                    Toast.makeText(getApplicationContext(), "room5", Toast.LENGTH_SHORT).show();
                     input_channel = "5";
                     checkRoomStatus(tv_room5.getText().toString());
                 }
@@ -556,7 +551,7 @@ public class LoginActivity extends Activity {
             Log.e("log_tag", "myListAlertDialog in");
             String[] listname = new String[jsonDataList.length];
             for (int i = 0; i < jsonDataList.length; i++) {
-                listname[i] = jsonDataList[i][1];
+                listname[i] = jsonDataList[i][3];
             }
 
             AlertDialog.Builder MyListAlertDialog = new AlertDialog.Builder(LoginActivity.this);
@@ -564,15 +559,17 @@ public class LoginActivity extends Activity {
             // 建立List的事件
             DialogInterface.OnClickListener ListClick = new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(LoginActivity.this, jsonDataList[which][1],// 顯示所點選的選項
+                    Toast.makeText(LoginActivity.this, jsonDataList[which][3],// 顯示所點選的選項
                             Toast.LENGTH_SHORT).show();
 
-                    //記憶ip位置,公司名稱,介紹,信箱
-                    setConfig(LoginActivity.this, "Config", "db_email", jsonDataList[which][0]);
-                    setConfig(LoginActivity.this, "Config", "db_comname", jsonDataList[which][1]);
-                    setConfig(LoginActivity.this, "Config", "db_comintro", jsonDataList[which][2]);
-                    setConfig(LoginActivity.this, "Config", "db_server", jsonDataList[which][3]);
-                    setConfig(LoginActivity.this, "Config", "db_account", jsonDataList[which][4]);
+                    //記憶帳號,密碼,email,公司名稱,介紹,ip位置
+                    setConfig(LoginActivity.this, "Config", "db_account", jsonDataList[which][0]);
+                    setConfig(LoginActivity.this, "Config", "db_password", jsonDataList[which][1]);
+                    setConfig(LoginActivity.this, "Config", "db_email", jsonDataList[which][2]);
+                    setConfig(LoginActivity.this, "Config", "db_comname", jsonDataList[which][3]);
+                    setConfig(LoginActivity.this, "Config", "db_comintro", jsonDataList[which][4]);
+                    setConfig(LoginActivity.this, "Config", "db_server", jsonDataList[which][5]);
+
                     tv_comname.setText(getConfig(LoginActivity.this,
                             "Config", "db_comname", ""));
                 }
@@ -607,7 +604,15 @@ public class LoginActivity extends Activity {
         SharedPreferences settings = context.getSharedPreferences(name, 0);
         return settings.getString(key, def);
     }
-
+    //初始化設定檔
+    public static void cleanConfig(Context context, String name)
+    {
+        //初始化
+        SharedPreferences settings = context.getSharedPreferences(name, 0);
+        SharedPreferences.Editor PE = settings.edit();
+        PE.clear();
+        PE.commit();
+    }
 
     //連線資料庫
     public void SQLConnect() {
@@ -623,18 +628,20 @@ public class LoginActivity extends Activity {
 
             } else {
                 JSONArray jsonArray = new JSONArray(result);
-                jsonDataList = new String[jsonArray.length()][5];
+                jsonDataList = new String[jsonArray.length()][6];
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     Log.e("log_tag SQLConnect", "for:" + i);
                     JSONObject jsonData = jsonArray.getJSONObject(i);
 
                     //存進陣列
-                    jsonDataList[i][0] = jsonData.getString("email");
-                    jsonDataList[i][1] = jsonData.getString("com_name");
-                    jsonDataList[i][2] = jsonData.getString("com_intro");
-                    jsonDataList[i][3] = jsonData.getString("server");
-                    jsonDataList[i][4] = jsonData.getString("account");
+                    jsonDataList[i][0] = jsonData.getString("account");
+                    jsonDataList[i][1] = jsonData.getString("password");
+                    jsonDataList[i][2] = jsonData.getString("email");
+                    jsonDataList[i][3] = jsonData.getString("com_name");
+                    jsonDataList[i][4] = jsonData.getString("com_intro");
+                    jsonDataList[i][5] = jsonData.getString("server");
+
                 }
             }
 
@@ -653,12 +660,7 @@ public class LoginActivity extends Activity {
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
-
-        //初始化
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("Config", 0);
-        SharedPreferences.Editor PE = settings.edit();
-        PE.clear();
-        PE.commit();
+        cleanConfig(LoginActivity.this,"Config");//將記憶體初始化
         Log.e("log_tag LoginActivity", "onDestroy 初始化");
 
         try {
