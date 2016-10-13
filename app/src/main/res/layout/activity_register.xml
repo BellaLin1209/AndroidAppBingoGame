@@ -1,0 +1,182 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.bingo.SettingActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="管理員註冊"
+            android:id="@+id/textView26"
+            android:textSize="25dp"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="帳號："
+                android:textSize="15dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ed_id"
+                android:layout_weight="1"
+                android:textSize="15dp"
+                android:hint="請輸入申請帳號"
+                android:textColor="#FFE6EAEC" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="密碼："
+                android:textSize="15dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:id="@+id/ed_password"
+                android:textSize="15dp"
+                android:hint="請輸入申請密碼"
+                android:textColor="#FFE6EAEC" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Server IP位置："
+                android:textSize="15dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="50"
+                android:id="@+id/ed_serverip"
+                android:textSize="15dp"
+                android:hint="請輸入伺服器IP位置"
+                android:textColor="#FFE6EAEC" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="公司名稱："
+                android:textSize="15dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="50"
+                android:id="@+id/ed_comname"
+                android:textSize="15dp"
+                android:hint="請輸入公司名稱"
+                android:textColor="#FFE6EAEC" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="聯絡信箱："
+                android:id="@+id/textView28"
+                android:textSize="15dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="50"
+                android:id="@+id/ed_email"
+                android:textSize="15dp"
+                android:hint="請輸入電子信箱"
+                android:textColor="#FFE6EAEC" />
+        </LinearLayout>
+
+        <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="公司簡介："
+            android:textSize="15dp"
+            android:textColor="#000000" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:inputType="textPassword"
+            android:ems="50"
+            android:id="@+id/ed_comintro"
+            android:textSize="15dp"
+            android:hint="請輸入公司簡介,如營業電話.地址.時間.."
+            android:textColor="#FFE6EAEC"
+            android:singleLine="false"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="確定"
+            android:background="@drawable/button_cus_blue"
+            android:id="@+id/btn_ok"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+</LinearLayout>

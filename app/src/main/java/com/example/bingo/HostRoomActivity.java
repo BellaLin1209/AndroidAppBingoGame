@@ -295,7 +295,6 @@ public class HostRoomActivity extends Activity {
                 try {
                     if (inStream.available() > 0) {
 
-
                         //接收byte
                         byte[] recvByte = new byte[1024 * 2];
                         int recvCount;
